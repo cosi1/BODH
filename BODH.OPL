@@ -1,0 +1,73 @@
+bodh:
+local kbflags%,kbstat%
+local base1%,in$(15)
+local base2%,out$(15)
+local dec%,x%,y%
+local i%,len%,dig$(1)
+local digits$(16)
+digits$="0123456789abcdef"
+
+kbflags%=peekb($7b)
+kbstat%=1+(kbflags% and $01)+(kbflags% and $40)/32
+kstat 4
+at 1,2
+print "in:",
+input in$
+in$=lower$(in$)
+cls
+print "   Input base:"
+base1%=getbase%:
+onerr toobig::
+if base1%=10
+ dec%=val(in$)
+else
+ i%=0
+ dec%=0
+ len%=len(in$)
+ while i%<len%
+  dig$=mid$(in$,len%-i%,1)
+  dec%=dec%+(loc(digits$,dig$)-1)*base1%**i%
+  i%=i%+1
+ endwh
+endif
+cls
+if dec%<0
+ at 4,2
+ print "Invalid number"
+ goto end::
+endif
+print "  Output base:"
+base2%=getbase%:
+if base2%=10
+ out$=num$(dec%,10)
+else
+ i%=0
+ onerr ovrflw::
+ while base2%**i%<=dec%
+  i%=i%+1
+ endwh
+ ovrflw::
+ onerr off
+ while i%>0
+  i%=i%-1
+  y%=base2%**i%
+  x%=int(dec%/y%)
+  dig$=mid$(digits$,x%+1,1)
+  out$=out$+dig$
+  dec%=dec%-x%*y%
+ endwh
+endif
+cls
+at 1,2
+print "out:",out$
+goto end::
+toobig::
+if err=195
+ at 4,2
+ print "Number too big"
+else
+ raise err
+endif
+end::
+get
+kstat kbstat%

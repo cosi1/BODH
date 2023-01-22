@@ -1,0 +1,12 @@
+GETBASE%:
+local b%
+b%=menun(2,"hex,dec,oct,bin")
+if b%=1
+ return 16
+elseif b%=2
+ return 10
+elseif b%=3
+ return 8
+else
+ return 2
+endif
